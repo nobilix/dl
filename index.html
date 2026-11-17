@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Open in Claude</title>
+<style>
+  body { font: 16px/1.5 -apple-system, system-ui, sans-serif; margin: 20vh auto; max-width: 32rem; padding: 0 16px; background: #fff; color: #222; }
+  @media (prefers-color-scheme: dark) { body { background: #1a1a1a; color: #ddd; } a { color: #8ab4f8; } }
+</style>
+<p id="msg">Opening Claude…</p>
+<p><a id="go" href="#">Open manually</a></p>
+<script>
+  // Target lives in the hash, so it never reaches the server: /#claude://code/...
+  const target = location.hash.slice(1);
+  if (target.startsWith("claude://")) {
+    document.getElementById("go").href = target;
+    location.replace(target);
+  } else {
+    document.getElementById("msg").textContent = "No claude:// link in the URL.";
+    document.getElementById("go").remove();
+  }
+</script>
