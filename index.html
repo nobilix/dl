@@ -2,21 +2,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Open in Claude</title>
+<title>Deep link</title>
 <style>
   body { font: 16px/1.5 -apple-system, system-ui, sans-serif; margin: 20vh auto; max-width: 32rem; padding: 0 16px; background: #fff; color: #222; }
-  @media (prefers-color-scheme: dark) { body { background: #1a1a1a; color: #ddd; } a { color: #8ab4f8; } }
+  code { word-break: break-all; font-size: 13px; color: #666; }
+  @media (prefers-color-scheme: dark) { body { background: #1a1a1a; color: #ddd; } a { color: #8ab4f8; } code { color: #999; } }
 </style>
-<p id="msg">Opening Claude…</p>
+<p id="msg"></p>
 <p><a id="go" href="#">Open manually</a></p>
+<p><code id="target"></code></p>
 <script>
-  // Target lives in the hash, so it never reaches the server: /#claude://code/...
+  // Redirects to the app deep link in the hash: /dl/#obsidian://open?vault=...
+  // The hash never reaches the server and is used as is, without decoding.
+  // Web and script schemes are refused: this page is for app links only, not an open redirect.
+  const BLOCKED = ["http", "https", "javascript", "data", "vbscript", "file", "blob", "about"];
+
   const target = location.hash.slice(1);
-  if (target.startsWith("claude://")) {
-    document.getElementById("go").href = target;
+  const scheme = (target.match(/^([a-z][a-z0-9+.-]*):/i) || [])[1]?.toLowerCase();
+  const msg = document.getElementById("msg");
+  const go = document.getElementById("go");
+
+  if (scheme && !BLOCKED.includes(scheme)) {
+    msg.textContent = `Opening ${scheme}://…`;
+    go.href = target;
+    document.getElementById("target").textContent = target;
     location.replace(target);
   } else {
-    document.getElementById("msg").textContent = "No claude:// link in the URL.";
-    document.getElementById("go").remove();
+    msg.textContent = scheme ? `${scheme}: links are not supported.` : "No deep link in the URL.";
+    go.remove();
   }
 </script>
